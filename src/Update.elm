@@ -1,12 +1,24 @@
-module Update exposing (Msg(..), subscriptions, update)
+port module Update exposing (Msg(..), subscriptions, update)
 
 import Model exposing (Institution, Location, Model, Person, Ticket)
 import Time exposing (Posix, Zone)
 
 
+port print : () -> Cmd msg
+
+
+port getWordFile : () -> Cmd msg
+
+
+port updateWordFile : (String -> msg) -> Sub msg
+
+
 type Msg
     = UpdateTime Posix
     | UpdateTimezone Zone
+    | Print
+    | GetWordFile
+    | UpdateWordFile String
     | UpdateLocation String String
     | UpdatePerson String String
     | UpdateInstitution String String
@@ -100,33 +112,45 @@ updateTicket key value ticket =
         ticket
 
 
-updateModel : Msg -> Model -> Model
-updateModel msg model =
-    case msg of
-        UpdateTime now ->
-            { model | now = now }
-
-        UpdateTimezone zone ->
-            { model | timezone = zone }
-
-        UpdateLocation key value ->
-            { model | location = updateLocation key value model.location }
-
-        UpdatePerson key value ->
-            { model | person = updatePerson key value model.person }
-
-        UpdateInstitution key value ->
-            { model | institution = updateInstitution key value model.institution }
-
-        UpdateTicket key value ->
-            { model | ticket = updateTicket key value model.ticket }
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( updateModel msg model, Cmd.none )
+    case msg of
+        UpdateTime now ->
+            update GetWordFile { model | now = Just now }
+
+        UpdateTimezone zone ->
+            ( { model | timezone = zone }, Cmd.none )
+
+        Print ->
+            ( model, print () )
+
+        GetWordFile ->
+            ( model, getWordFile () )
+
+        UpdateWordFile documentInHtml ->
+            ( { model | documentInHtml = documentInHtml }, Cmd.none )
+
+        UpdateLocation key value ->
+            update GetWordFile { model | location = updateLocation key value model.location }
+
+        UpdatePerson key value ->
+            update GetWordFile { model | person = updatePerson key value model.person }
+
+        UpdateInstitution key value ->
+            update GetWordFile { model | institution = updateInstitution key value model.institution }
+
+        UpdateTicket key value ->
+            update GetWordFile { model | ticket = updateTicket key value model.ticket }
 
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-    Time.every 5000 UpdateTime
+    case model.now of
+        Just now ->
+            updateWordFile UpdateWordFile
+
+        Nothing ->
+            Sub.batch
+                [ updateWordFile UpdateWordFile
+                , Time.every 1 UpdateTime
+                ]

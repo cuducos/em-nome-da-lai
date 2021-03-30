@@ -1,0 +1,20 @@
+body > .ui.container {
+  margin-top: 3em;
+}
+
+.ui.container > h1 {
+  font-size: 3em;
+  text-align: center;
+  font-weight: normal;
+}
+
+footer.ui.divider {
+  font-size: 1.68rem;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+footer a,
+footer a:hover {
+  color: #333;
+}

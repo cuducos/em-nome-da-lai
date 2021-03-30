@@ -1,33 +1,21 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Em nome da LAI</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css" integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ==" crossorigin="anonymous" />
-  <style>
-    body > .ui.container {
-      margin-top: 3em;
-    }
-    .ui.container > h1 {
-      font-size: 3em;
-      text-align: center;
-      font-weight: normal;
-    }
-    footer.ui.divider {
-      font-size: 1.68rem;
-      padding: 1rem 0;
-      text-align: center;
-    }
-    footer a,
-    footer a:hover  {
-      color: #333;
-    }
-  </style>
-</title>
-</head>
-<body>
-  <div id="app"></div>
-  <script src="/app.js"></script>
-  <script>Elm.Main.init({node: document.getElementById("app")});</script>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Em nome da LAI</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.4.1/semantic.min.css"
+      integrity="sha512-8bHTC73gkZ7rZ7vpqUQThUDhqcNFyYi2xgDgPDHc+GXVGHXq+xPjynxIopALmOPqzo9JZj0k6OqqewdGO3EsrQ=="
+      crossorigin="anonymous"
+      media="screen"
+    />
+    <link href="/app.css" rel="stylesheet" media="screen" />
+    <link href="/print.css" rel="stylesheet" media="print" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script src="/app.js"></script>
+    <script src="/init.js"></script>
+  </body>
 </html>

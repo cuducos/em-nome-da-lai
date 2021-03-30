@@ -45,6 +45,7 @@ type alias Model =
     , person : Person
     , institution : Institution
     , ticket : Ticket
-    , now : Posix
+    , now : Maybe Posix
     , timezone : Zone
+    , documentInHtml : String
     }

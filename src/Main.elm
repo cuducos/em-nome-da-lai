@@ -17,8 +17,9 @@ init _ =
       , person = Person "" "" "" "" "" "" "" "" "" ""
       , institution = Institution "" "" "" "" "" ""
       , ticket = Ticket "" "" ""
-      , now = Time.millisToPosix 0
+      , now = Nothing
       , timezone = Time.utc
+      , documentInHtml = ""
       }
     , Task.perform UpdateTimezone Time.here
     )

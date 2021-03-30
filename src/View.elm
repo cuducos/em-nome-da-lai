@@ -1,10 +1,10 @@
 module View exposing (view)
 
 import Html exposing (Html)
-import Html.Attributes exposing (class, href, src, style, value)
-import Html.Events exposing (onInput)
+import Html.Attributes exposing (class, download, href, id, src, style, type_, value)
+import Html.Events exposing (onClick, onInput)
 import Model exposing (Institution, Location, Model, Person, Ticket)
-import Time exposing (Month(..))
+import Time exposing (Month(..), Posix)
 import Update exposing (Msg(..))
 
 
@@ -173,6 +173,22 @@ viewForm model =
                 , viewFormPerson model.person
                 , viewFormInstitution model.institution
                 , viewFormTicket model
+                , [ Html.a
+                        [ class "ui right labeled icon button"
+                        , href model.documentInHtml
+                        , download "em-nome-da-lai.doc"
+                        ]
+                        [ Html.i [ class "file word icon" ] []
+                        , Html.text "Baixar como arquivo do Word"
+                        ]
+                  , Html.a
+                        [ class "ui right labeled icon button"
+                        , onClick Print
+                        ]
+                        [ Html.i [ class "print icon" ] []
+                        , Html.text "Imprimir"
+                        ]
+                  ]
                 ]
     in
     Html.form [ class "ui form" ] nodes
@@ -355,17 +371,21 @@ viewSignature model =
                     Dec ->
                         "dezembro"
 
+            now : Posix
+            now =
+                Maybe.withDefault (Time.millisToPosix 0) model.now
+
+            dateAsString : String
+            dateAsString =
+                String.join " de "
+                    [ now |> Time.toDay model.timezone |> String.fromInt
+                    , now |> Time.toMonth model.timezone |> monthToString
+                    , now |> Time.toYear model.timezone |> String.fromInt
+                    ]
+
             value : String
             value =
-                String.concat
-                    [ model.location.city
-                    , ", "
-                    , model.now |> Time.toDay model.timezone |> String.fromInt
-                    , " de "
-                    , model.now |> Time.toMonth model.timezone |> monthToString
-                    , " de "
-                    , model.now |> Time.toYear model.timezone |> String.fromInt
-                    ]
+                String.concat [ model.location.city, dateAsString ]
         in
         [ Html.div
             []
@@ -399,7 +419,7 @@ viewDocument model =
                 , viewSignature model
                 ]
     in
-    [ Html.div [ class "ui padded piled segment" ] nodes ]
+    [ Html.div [ id "document", class "ui padded piled segment" ] nodes ]
 
 
 view : Model -> Html Msg
@@ -409,14 +429,14 @@ view model =
         [ Html.div
             [ class "ui grid" ]
             [ Html.div
-                [ class "eight wide column" ]
+                [ class "eight wide column do-not-print" ]
                 [ Html.h1 [] [ Html.text "Em nome da LAI" ]
                 , Html.p [] [ Html.text "Aqui vem um parágrafo descrevendo o projeto, contanto para que serve, como usar, etc." ]
                 , Html.p [] [ Html.text "Comentar que nenhum dado é enviado ao servidor e que tudo fica apenas local, no computador de quem usa o site" ]
                 , viewForm model
                 ]
             , Html.div
-                [ class "eight wide column" ]
+                [ class "eight wide column print" ]
                 (viewDocument model)
             ]
         , Html.footer

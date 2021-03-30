@@ -1,0 +1,24 @@
+@page {
+  counter-increment: page;
+  margin: 2.5cm 3.5cm 2.5cm 3.25cm;
+  orphans: 3;
+  size: 21cm 29.7cm;
+  widows: 3;
+}
+
+@bottom-center {
+  content: counter(page);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.print {
+  width: 100;
+}
+.do-not-print {
+  display: none;
+}
