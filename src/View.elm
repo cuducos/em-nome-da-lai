@@ -156,7 +156,7 @@ viewFormTicket model =
             ]
         , Html.div
             [ class "four wide field" ]
-            [ Html.label [] [ Html.text "Prazo para resposta" ]
+            [ Html.label [] [ Html.text "Data para resposta" ]
             , Html.input [ value model.ticket.deadline, onInput (UpdateTicket "deadline") ] []
             ]
         ]
