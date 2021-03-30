@@ -13,7 +13,7 @@ app.ports.getWordFile.subscribe(() => {
           "<body>",
           document.getElementById("document").innerHTML,
           "</body>",
-          "</html>"
+          "</html>",
         ].join()
       )
   );

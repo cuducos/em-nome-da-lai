@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "Em nome da LAI! Gerador de petições com base na LAI.",
   "scripts": {
-    "start": "elm-live src/Main.elm --start-page=index.html --dir=dist/ --path-to-elm=node_modules/.bin/elm --open --hot -- --output=dist/app.js --debug",
-    "build": "elm make src/Main.elm --optimize --output=dist/app.js",
+    "start": "elm-live src/Main.elm --start-page=index.html --dir=dist/ --path-to-elm=node_modules/.bin/elm --open --hot -- --output=dist/js/app.js --debug",
+    "build": "elm make src/Main.elm --optimize --output=dist/js/app.js",
     "test": "elm-format src/ --validate && prettier dist/ --check"
   },
   "repository": {
