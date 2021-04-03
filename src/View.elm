@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import Form.Model exposing (FieldSet)
-import Form.View exposing (isSetValid, isValid)
+import Form.View exposing (isValid)
 import Html exposing (Html)
 import Html.Attributes exposing (class, download, href, id, src, style, type_, value)
 import Html.Events exposing (onClick, onInput)
@@ -16,25 +16,22 @@ viewForm model =
         nodes : List (Html Msg)
         nodes =
             List.concat
-                [ Form.View.set model.location UpdateLocation
-                , Form.View.set model.person UpdatePerson
-                , Form.View.set model.institution UpdateInstitution
-                , Form.View.set model.ticket UpdateTicket
-                , [ Html.a
-                        [ class "ui right labeled icon button"
-                        , href model.documentInHtml
+                [ Form.View.set model.form.location UpdateLocation
+                , Form.View.set model.form.person UpdatePerson
+                , Form.View.set model.form.institution UpdateInstitution
+                , Form.View.set model.form.ticket UpdateTicket
+                , [ Form.View.button
+                        "Baixar como arquivo do Word"
+                        "word file"
+                        model.form.valid
+                        [ href model.documentInHtml
                         , download "em-nome-da-lai.doc"
                         ]
-                        [ Html.i [ class "file word icon" ] []
-                        , Html.text "Baixar como arquivo do Word"
-                        ]
-                  , Html.a
-                        [ class "ui right labeled icon button"
-                        , onClick Print
-                        ]
-                        [ Html.i [ class "print icon" ] []
-                        , Html.text "Imprimir"
-                        ]
+                  , Form.View.button
+                        "Imprimir"
+                        "print"
+                        model.form.valid
+                        [ onClick Print ]
                   ]
                 ]
     in
@@ -59,7 +56,7 @@ placeholder =
 
 viewTitle : FieldSet -> List (Html Msg)
 viewTitle location =
-    if isSetValid location then
+    if location.valid then
         let
             value : String
             value =
@@ -78,7 +75,7 @@ viewTitle location =
 
 viewId : FieldSet -> List (Html Msg)
 viewId person =
-    if isSetValid person then
+    if person.valid then
         let
             value : String
             value =
@@ -113,7 +110,7 @@ viewId person =
 
 viewInstitution : FieldSet -> List (Html Msg)
 viewInstitution institution =
-    if isSetValid institution then
+    if institution.valid then
         let
             value : String
             value =
@@ -141,24 +138,24 @@ viewInstitution institution =
 
 viewTicket : Model -> List (Html Msg)
 viewTicket model =
-    if isSetValid model.ticket && isValid "Razão social" model.institution then
+    if model.form.ticket.valid && isValid "Razão social" model.form.institution then
         let
             paragraph1 : String
             paragraph1 =
                 String.concat
                     [ "Em "
-                    , Form.View.value "Data do protocolo" model.ticket
+                    , Form.View.value "Data do protocolo" model.form.ticket
                     , " a parte autora protocolou pedido de acesso à informação, com base no art. 10 da Lei Federal 12.527/2011 (LAI) (Doc.1), perante "
-                    , Form.View.value "Razão social" model.institution
+                    , Form.View.value "Razão social" model.form.institution
                     , ", cujo registro de protocolo foi "
-                    , Form.View.value "Número de protocolo" model.ticket
+                    , Form.View.value "Número de protocolo" model.form.ticket
                     ]
 
             paragraph2 : String
             paragraph2 =
                 String.concat
                     [ "Sendo assim, o termo final para entrega da resposta era "
-                    , Form.View.value "Data para resposta" model.ticket
+                    , Form.View.value "Data para resposta" model.form.ticket
                     , ". Entretanto, até a data de ajuizamento desta ação, não houve resposta. Assim, faz-se necessária esta ação, uma vez que não há outro meio de exercer o direito fundamental de acesso à informação neste caso senão pelo Judiciário."
                     ]
         in
@@ -174,7 +171,7 @@ viewTicket model =
 
 viewSignature : Model -> List (Html Msg)
 viewSignature model =
-    if isValid "Nome completo" model.person && isValid "Cidade" model.location then
+    if isValid "Nome completo" model.form.person && isValid "Cidade" model.form.location then
         let
             monthToString : Month -> String
             monthToString month =
@@ -229,11 +226,11 @@ viewSignature model =
 
             value : String
             value =
-                String.concat [ Form.View.value "Cidade" model.location, ", ", dateAsString ]
+                String.concat [ Form.View.value "Cidade" model.form.location, ", ", dateAsString ]
         in
         [ Html.div
             []
-            [ Html.text (Form.View.value "Nome completo" model.person)
+            [ Html.text (Form.View.value "Nome completo" model.form.person)
             , Html.br [] []
             , Html.text value
             ]
@@ -249,10 +246,10 @@ viewDocument model =
         nodes : List (Html Msg)
         nodes =
             List.concat
-                [ viewTitle model.location
-                , viewId model.person
+                [ viewTitle model.form.location
+                , viewId model.form.person
                 , [ Html.strong [ style "text-transform" "uppercase" ] [ Html.text "Ação de obrigação de fazer" ] ]
-                , viewInstitution model.institution
+                , viewInstitution model.form.institution
                 , [ Html.strong [ style "text-transform" "uppercase" ] [ Html.text "Fundamentos" ] ]
                 , viewTicket model
                 , [ Html.strong [ style "text-transform" "uppercase" ] [ Html.text "Requerimentos" ]

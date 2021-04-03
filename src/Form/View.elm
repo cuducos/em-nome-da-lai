@@ -1,18 +1,9 @@
-module Form.View exposing (field, get, isSetValid, isValid, set, value)
+module Form.View exposing (button, field, get, isValid, set, value)
 
 import Form.Model exposing (Field, FieldRow, FieldSet, Width(..))
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onInput)
-
-
-isSetValid : FieldSet -> Bool
-isSetValid s =
-    s.rows
-        |> List.concat
-        |> List.map .valid
-        |> List.member False
-        |> not
 
 
 get : String -> FieldSet -> Maybe Field
@@ -130,3 +121,42 @@ row msg r =
 set : FieldSet -> (String -> String -> msg) -> List (Html msg)
 set s msg =
     Html.h4 [ class "ui dividing header" ] [ Html.text s.title ] :: List.map (row msg) s.rows
+
+
+button : String -> String -> Bool -> List (Html.Attribute msg) -> Html msg
+button text icon enabled attrs =
+    let
+        classesToAttr : List String -> Html.Attribute msg
+        classesToAttr list =
+            list
+                |> String.join " "
+                |> class
+
+        initialButtonClasses : List String
+        initialButtonClasses =
+            [ "ui", "right", "labeled", "icon", "button" ]
+
+        buttonClasses : List String
+        buttonClasses =
+            if enabled then
+                initialButtonClasses
+
+            else
+                "disabled" :: initialButtonClasses
+
+        buttonsAttrs : List (Html.Attribute msg)
+        buttonsAttrs =
+            classesToAttr buttonClasses :: attrs
+
+        iconAttrs : List (Html.Attribute msg)
+        iconAttrs =
+            [ icon, "icon" ]
+                |> String.join " "
+                |> class
+                |> List.singleton
+    in
+    Html.a
+        buttonsAttrs
+        [ Html.i iconAttrs []
+        , Html.text text
+        ]

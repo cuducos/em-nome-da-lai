@@ -18,6 +18,7 @@ location : FieldSet
 location =
     FieldSet
         "Localização do tribunal"
+        False
         [ [ newField "Cidade" Fourteen [] Nothing
           , newField "UF" Two [ Form.Validators.state ] (Just String.toUpper)
           ]
@@ -28,6 +29,7 @@ person : FieldSet
 person =
     FieldSet
         "Informações pessoais"
+        False
         [ [ newField "Nome completo" Sixteen [] Nothing ]
         , [ newField "Nacionalidade" Six [] Nothing
           , newField "Ocupação" Six [] Nothing
@@ -48,6 +50,7 @@ institution : FieldSet
 institution =
     FieldSet
         "Informações do órgão público"
+        False
         [ [ newField "CNPJ" Sixteen [ Form.Validators.cnpj ] (Just Form.Mask.cnpj) ]
         , [ newField "Razão social" Sixteen [] Nothing ]
         , [ newField "Endereço" Sixteen [] Nothing ]
@@ -62,6 +65,7 @@ ticket : FieldSet
 ticket =
     FieldSet
         "Informações do requerimento pela LAI"
+        False
         [ [ newField "Número do protocolo" Eight [] Nothing
           , newField "Data do protocolo" Four [ Form.Validators.date ] (Just Form.Mask.date)
           , newField "Data para resposta" Four [ Form.Validators.date ] (Just Form.Mask.date)
@@ -71,10 +75,13 @@ ticket =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( { location = location
-      , person = person
-      , institution = institution
-      , ticket = ticket
+    ( { form =
+            { location = location
+            , person = person
+            , institution = institution
+            , ticket = ticket
+            , valid = False
+            }
       , now = Nothing
       , timezone = Time.utc
       , documentInHtml = ""

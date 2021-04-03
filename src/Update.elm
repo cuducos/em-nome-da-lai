@@ -1,8 +1,8 @@
 port module Update exposing (Msg(..), subscriptions, update)
 
 import Form.Model exposing (FieldSet)
-import Form.Update
-import Model exposing (Model)
+import Form.Update exposing (isFormValid)
+import Model exposing (Form, Model)
 import Time exposing (Posix, Zone)
 
 
@@ -27,8 +27,33 @@ type Msg
     | UpdateTicket String String
 
 
+validate : Form -> Form
+validate form =
+    let
+        valid : Bool
+        valid =
+            isFormValid
+                [ form.location
+                , form.person
+                , form.institution
+                , form.ticket
+                ]
+    in
+    { form | valid = valid }
+
+
+updateForm : Model -> Form -> ( Model, Cmd Msg )
+updateForm model form =
+    update GetWordFile { model | form = validate form }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        form : Form
+        form =
+            model.form
+    in
     case msg of
         UpdateTime now ->
             update GetWordFile { model | now = Just now }
@@ -46,16 +71,16 @@ update msg model =
             ( { model | documentInHtml = documentInHtml }, Cmd.none )
 
         UpdateLocation key value ->
-            update GetWordFile { model | location = Form.Update.set key value model.location }
+            updateForm model { form | location = Form.Update.set key value form.location }
 
         UpdatePerson key value ->
-            update GetWordFile { model | person = Form.Update.set key value model.person }
+            updateForm model { form | person = Form.Update.set key value form.person }
 
         UpdateInstitution key value ->
-            update GetWordFile { model | institution = Form.Update.set key value model.institution }
+            updateForm model { form | institution = Form.Update.set key value form.institution }
 
         UpdateTicket key value ->
-            update GetWordFile { model | ticket = Form.Update.set key value model.ticket }
+            updateForm model { form | ticket = Form.Update.set key value form.ticket }
 
 
 subscriptions : Model -> Sub Msg

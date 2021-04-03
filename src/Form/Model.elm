@@ -37,6 +37,7 @@ type alias FieldRow =
 
 type alias FieldSet =
     { title : String
+    , valid : Bool
     , rows : List FieldRow
     }
 

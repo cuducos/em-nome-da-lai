@@ -1,4 +1,4 @@
-module Form.Update exposing (field, set)
+module Form.Update exposing (field, isFormValid, set)
 
 import Form.Model exposing (Field, FieldRow, FieldSet)
 
@@ -53,6 +53,28 @@ rows key value r =
         r
 
 
+isFormValid : List FieldSet -> Bool
+isFormValid fieldsets =
+    fieldsets
+        |> List.map isSetValid
+        |> List.member False
+        |> not
+
+
+isSetValid : FieldSet -> Bool
+isSetValid s =
+    s.rows
+        |> List.concat
+        |> List.map .valid
+        |> List.member False
+        |> not
+
+
+validateSet : FieldSet -> FieldSet
+validateSet s =
+    { s | valid = isSetValid s }
+
+
 set : String -> String -> FieldSet -> FieldSet
 set key value s =
-    { s | rows = List.map (\r -> rows key value r) s.rows }
+    validateSet { s | rows = List.map (\r -> rows key value r) s.rows }
