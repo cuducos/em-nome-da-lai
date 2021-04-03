@@ -1,166 +1,13 @@
 module View exposing (view)
 
+import Form.Model exposing (FieldSet)
+import Form.View exposing (isSetValid, isValid)
 import Html exposing (Html)
 import Html.Attributes exposing (class, download, href, id, src, style, type_, value)
 import Html.Events exposing (onClick, onInput)
-import Model exposing (Institution, Location, Model, Person, Ticket)
+import Model exposing (Model)
 import Time exposing (Month(..), Posix)
 import Update exposing (Msg(..))
-
-
-viewFormLocation : Location -> List (Html Msg)
-viewFormLocation location =
-    [ Html.h4
-        [ class "ui dividing header" ]
-        [ Html.text "Localização do tribunal" ]
-    , Html.div
-        [ class "fields" ]
-        [ Html.div
-            [ class "fourteen wide field" ]
-            [ Html.label [] [ Html.text "Cidade" ]
-            , Html.input [ value location.city, onInput (UpdateLocation "city") ] []
-            ]
-        , Html.div
-            [ class "two wide field" ]
-            [ Html.label [] [ Html.text "UF" ]
-            , Html.input [ value location.state, onInput (UpdateLocation "state") ] []
-            ]
-        ]
-    ]
-
-
-viewFormPerson : Person -> List (Html Msg)
-viewFormPerson person =
-    [ Html.h4
-        [ class "ui dividing header" ]
-        [ Html.text "Informações pessoais" ]
-    , Html.div
-        [ class "field" ]
-        [ Html.label [] [ Html.text "Nome completo" ]
-        , Html.input [ value person.name, onInput (UpdatePerson "name") ] []
-        ]
-    , Html.div
-        [ class "fields" ]
-        [ Html.div
-            [ class "six wide field" ]
-            [ Html.label [] [ Html.text "Nacionalidade" ]
-            , Html.input [ value person.nationality, onInput (UpdatePerson "nationality") ] []
-            ]
-        , Html.div
-            [ class "six wide field" ]
-            [ Html.label [] [ Html.text "Ocupação" ]
-            , Html.input [ value person.occupation, onInput (UpdatePerson "occupation") ] []
-            ]
-        , Html.div
-            [ class "four wide field" ]
-            [ Html.label [] [ Html.text "Estado Civil" ]
-            , Html.input [ value person.maritalStatus, onInput (UpdatePerson "maritalStatus") ] []
-            ]
-        ]
-    , Html.div
-        [ class "fields" ]
-        [ Html.div
-            [ class "eight wide field" ]
-            [ Html.label [] [ Html.text "RG" ]
-            , Html.input [ value person.personalId, onInput (UpdatePerson "personalId") ] []
-            ]
-        , Html.div
-            [ class "eight wide field" ]
-            [ Html.label [] [ Html.text "CPF" ]
-            , Html.input [ value person.federalRevenueId, onInput (UpdatePerson "federalRevenueId") ] []
-            ]
-        ]
-    , Html.div
-        [ class "field" ]
-        [ Html.label [] [ Html.text "Endereço" ]
-        , Html.input [ value person.address, onInput (UpdatePerson "address") ] []
-        ]
-    , Html.div
-        [ class "fields" ]
-        [ Html.div
-            [ class "ten wide field" ]
-            [ Html.label [] [ Html.text "Cidade" ]
-            , Html.input [ value person.city, onInput (UpdatePerson "city") ] []
-            ]
-        , Html.div
-            [ class "two wide field" ]
-            [ Html.label [] [ Html.text "UF" ]
-            , Html.input [ value person.state, onInput (UpdatePerson "state") ] []
-            ]
-        , Html.div
-            [ class "four wide field" ]
-            [ Html.label [] [ Html.text "CEP" ]
-            , Html.input [ value person.postalCode, onInput (UpdatePerson "postalCode") ] []
-            ]
-        ]
-    ]
-
-
-viewFormInstitution : Institution -> List (Html Msg)
-viewFormInstitution institution =
-    [ Html.h4
-        [ class "ui dividing header" ]
-        [ Html.text "Informações do órgão público" ]
-    , Html.div
-        [ class "field" ]
-        [ Html.label [] [ Html.text "Razão social" ]
-        , Html.input [ value institution.name, onInput (UpdateInstitution "name") ] []
-        ]
-    , Html.div
-        [ class "field" ]
-        [ Html.label [] [ Html.text "CNPJ" ]
-        , Html.input [ value institution.federalRevenueId, onInput (UpdateInstitution "federalRevenueId") ] []
-        ]
-    , Html.div
-        [ class "field" ]
-        [ Html.label [] [ Html.text "Endereço" ]
-        , Html.input [ value institution.address, onInput (UpdateInstitution "address") ] []
-        ]
-    , Html.div
-        [ class "fields" ]
-        [ Html.div
-            [ class "ten wide field" ]
-            [ Html.label [] [ Html.text "Cidade" ]
-            , Html.input [ value institution.city, onInput (UpdateInstitution "city") ] []
-            ]
-        , Html.div
-            [ class "two wide field" ]
-            [ Html.label [] [ Html.text "UF" ]
-            , Html.input [ value institution.state, onInput (UpdateInstitution "state") ] []
-            ]
-        , Html.div
-            [ class "four wide field" ]
-            [ Html.label [] [ Html.text "CEP" ]
-            , Html.input [ value institution.postalCode, onInput (UpdateInstitution "postalCode") ] []
-            ]
-        ]
-    ]
-
-
-viewFormTicket : Model -> List (Html Msg)
-viewFormTicket model =
-    [ Html.h4
-        [ class "ui dividing header" ]
-        [ Html.text "Informações do requerimento pela LAI" ]
-    , Html.div
-        [ class "fields" ]
-        [ Html.div
-            [ class "eight wide field" ]
-            [ Html.label [] [ Html.text "Número do protocolo" ]
-            , Html.input [ value model.ticket.id, onInput (UpdateTicket "id") ] []
-            ]
-        , Html.div
-            [ class "four wide field" ]
-            [ Html.label [] [ Html.text "Data do protocolo" ]
-            , Html.input [ value model.ticket.date, onInput (UpdateTicket "date") ] []
-            ]
-        , Html.div
-            [ class "four wide field" ]
-            [ Html.label [] [ Html.text "Data para resposta" ]
-            , Html.input [ value model.ticket.deadline, onInput (UpdateTicket "deadline") ] []
-            ]
-        ]
-    ]
 
 
 viewForm : Model -> Html Msg
@@ -169,10 +16,10 @@ viewForm model =
         nodes : List (Html Msg)
         nodes =
             List.concat
-                [ viewFormLocation model.location
-                , viewFormPerson model.person
-                , viewFormInstitution model.institution
-                , viewFormTicket model
+                [ Form.View.set model.location UpdateLocation
+                , Form.View.set model.person UpdatePerson
+                , Form.View.set model.institution UpdateInstitution
+                , Form.View.set model.ticket UpdateTicket
                 , [ Html.a
                         [ class "ui right labeled icon button"
                         , href model.documentInHtml
@@ -210,111 +57,108 @@ placeholder =
     ]
 
 
-viewTitle : Location -> List (Html Msg)
+viewTitle : FieldSet -> List (Html Msg)
 viewTitle location =
-    if location.city == "" || location.state == "" then
-        [ Html.h1 [ style "text-transform" "uppercase" ] [ Html.text "Juiz de Direito do Juizado Especial Cível" ] ]
-
-    else
+    if isSetValid location then
         let
             value : String
             value =
                 String.concat
                     [ "Juiz de Direito do Juizado Especial Cível da Comarca de "
-                    , location.city
+                    , Form.View.value "Cidade" location
                     , "/"
-                    , location.state
+                    , Form.View.value "UF" location
                     ]
         in
         [ Html.h1 [ style "text-transform" "uppercase" ] [ Html.text value ] ]
 
-
-viewId : Person -> List (Html Msg)
-viewId person =
-    if person.name == "" || person.nationality == "" || person.occupation == "" || person.maritalStatus == "" || person.personalId == "" || person.federalRevenueId == "" || person.address == "" || person.city == "" || person.state == "" || person.postalCode == "" then
-        placeholder
-
     else
+        [ Html.h1 [ style "text-transform" "uppercase" ] [ Html.text "Juiz de Direito do Juizado Especial Cível" ] ]
+
+
+viewId : FieldSet -> List (Html Msg)
+viewId person =
+    if isSetValid person then
         let
             value : String
             value =
                 String.concat
-                    [ person.name
+                    [ Form.View.value "Nome completo" person
                     , ", "
-                    , person.nationality
+                    , Form.View.value "Nacionalidade" person
                     , ", "
-                    , person.occupation
+                    , Form.View.value "Ocupação" person
                     , ", "
-                    , person.maritalStatus
+                    , Form.View.value "Estado civil" person
                     , ", RG "
-                    , person.personalId
+                    , Form.View.value "RG" person
                     , ", CPF "
-                    , person.federalRevenueId
+                    , Form.View.value "CPF" person
                     , ", residente na "
-                    , person.address
+                    , Form.View.value "Endereço" person
                     , ", "
-                    , person.city
+                    , Form.View.value "Cidade" person
                     , "/"
-                    , person.state
+                    , Form.View.value "UF" person
                     , ", CEP "
-                    , person.postalCode
+                    , Form.View.value "CEP" person
                     , ", vem propor a seguinte:"
                     ]
         in
         [ Html.p [] [ Html.text value ] ]
 
-
-viewInstitution : Institution -> List (Html Msg)
-viewInstitution institution =
-    if institution.name == "" || institution.federalRevenueId == "" || institution.address == "" || institution.city == "" || institution.state == "" || institution.postalCode == "" then
+    else
         placeholder
 
-    else
+
+viewInstitution : FieldSet -> List (Html Msg)
+viewInstitution institution =
+    if isSetValid institution then
         let
             value : String
             value =
                 String.concat
                     [ "Em face de "
-                    , institution.name
+                    , Form.View.value "Razão sozial" institution
                     , ", pessoa jurídica de direito público integrante da administração pública, inscrita no CNPJ sob o nº "
-                    , institution.federalRevenueId
+                    , Form.View.value "CNPJ" institution
                     , ", com sede na "
-                    , institution.address
+                    , Form.View.value "Endereço" institution
                     , ", "
-                    , institution.city
+                    , Form.View.value "Cidade" institution
                     , "/"
-                    , institution.state
+                    , Form.View.value "UF" institution
                     , ", CEP "
-                    , institution.postalCode
+                    , Form.View.value "CEP" institution
                     , ":"
                     ]
         in
         [ Html.p [] [ Html.text value ] ]
 
+    else
+        placeholder
+
 
 viewTicket : Model -> List (Html Msg)
 viewTicket model =
-    if model.ticket.id == "" || model.ticket.date == "" || model.ticket.deadline == "" || model.institution.name == "" then
-        placeholder
-
-    else
+    if isSetValid model.ticket && isValid "Razão social" model.institution then
         let
             paragraph1 : String
             paragraph1 =
                 String.concat
                     [ "Em "
-                    , model.ticket.date
+                    , Form.View.value "Data do protocolo" model.ticket
                     , " a parte autora protocolou pedido de acesso à informação, com base no art. 10 da Lei Federal 12.527/2011 (LAI) (Doc.1), perante "
-                    , model.institution.name
+                    , Form.View.value "Razão social" model.institution
                     , ", cujo registro de protocolo foi "
-                    , model.ticket.id
+                    , Form.View.value "Número de protocolo" model.ticket
                     ]
 
             paragraph2 : String
             paragraph2 =
                 String.concat
                     [ "Sendo assim, o termo final para entrega da resposta era "
-                    , model.ticket.deadline
+                    , Form.View.value "Data para resposta" model.ticket
                     , ". Entretanto, até a data de ajuizamento desta ação, não houve resposta. Assim, faz-se necessária esta ação, uma vez que não há outro meio de exercer o direito fundamental de acesso à informação neste caso senão pelo Judiciário."
                     ]
         in
@@ -324,13 +168,13 @@ viewTicket model =
         , Html.p [] [ Html.text paragraph2 ]
         ]
 
+    else
+        placeholder
+
 
 viewSignature : Model -> List (Html Msg)
 viewSignature model =
-    if model.person.name == "" || model.location.city == "" then
-        placeholder
-
-    else
+    if isValid "Nome completo" model.person && isValid "Cidade" model.location then
         let
             monthToString : Month -> String
             monthToString month =
@@ -385,15 +229,18 @@ viewSignature model =
 
             value : String
             value =
-                String.concat [ model.location.city, dateAsString ]
+                String.concat [ Form.View.value "Cidade" model.location, ", ", dateAsString ]
         in
         [ Html.div
             []
-            [ Html.text model.person.name
+            [ Html.text (Form.View.value "Nome completo" model.person)
             , Html.br [] []
             , Html.text value
             ]
         ]
+
+    else
+        placeholder
 
 
 viewDocument : Model -> List (Html Msg)
