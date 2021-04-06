@@ -1,7 +1,8 @@
 module View exposing (view)
 
 import Form.Model exposing (FieldSet)
-import Form.View exposing (isValid)
+import Form.Update exposing (isValid)
+import Form.View
 import Html exposing (Html)
 import Html.Attributes exposing (class, download, href, id, src, style, type_, value)
 import Html.Events exposing (onClick, onInput)

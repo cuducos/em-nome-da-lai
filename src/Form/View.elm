@@ -1,17 +1,10 @@
-module Form.View exposing (button, field, get, isValid, set, value)
+module Form.View exposing (button, field, set, value)
 
 import Form.Model exposing (Field, FieldRow, FieldSet, Width(..))
+import Form.Update exposing (get)
 import Html exposing (Html)
 import Html.Attributes exposing (class)
 import Html.Events exposing (onInput)
-
-
-get : String -> FieldSet -> Maybe Field
-get key s =
-    s.rows
-        |> List.concat
-        |> List.filter (\f -> f.label == key)
-        |> List.head
 
 
 value : String -> FieldSet -> String
@@ -20,14 +13,6 @@ value key s =
         |> get key
         |> Maybe.map .value
         |> Maybe.withDefault ""
-
-
-isValid : String -> FieldSet -> Bool
-isValid key s =
-    s
-        |> get key
-        |> Maybe.map .valid
-        |> Maybe.withDefault False
 
 
 widthToString : Width -> List String

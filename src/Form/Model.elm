@@ -28,6 +28,7 @@ type alias Field =
     , mask : Maybe (String -> String)
     , valid : Bool
     , initialized : Bool
+    , disabled : Bool
     }
 
 
@@ -44,4 +45,4 @@ type alias FieldSet =
 
 newField : String -> Width -> List (String -> Bool) -> Maybe (String -> String) -> Field
 newField label width validators mask =
-    Field "" label width validators mask False False
+    Field "" label width validators mask False False False

@@ -1,6 +1,23 @@
-module Form.Update exposing (field, isFormValid, set)
+module Form.Update exposing (disable, enable, field, get, isFormValid, isValid, set)
 
 import Form.Model exposing (Field, FieldRow, FieldSet)
+import Set exposing (Set)
+
+
+get : String -> FieldSet -> Maybe Field
+get key s =
+    s.rows
+        |> List.concat
+        |> List.filter (\f -> f.label == key)
+        |> List.head
+
+
+isValid : String -> FieldSet -> Bool
+isValid key s =
+    s
+        |> get key
+        |> Maybe.map .valid
+        |> Maybe.withDefault False
 
 
 validate : Field -> Field
@@ -78,3 +95,30 @@ validateSet s =
 set : String -> String -> FieldSet -> FieldSet
 set key value s =
     validateSet { s | rows = List.map (\r -> rows key value r) s.rows }
+
+
+setDisabledto : Bool -> Set String -> FieldSet -> FieldSet
+setDisabledto value keys fieldset =
+    let
+        disableFieldsInRow : FieldRow -> FieldRow
+        disableFieldsInRow =
+            List.map
+                (\f ->
+                    if Set.member f.label keys then
+                        { f | disabled = value }
+
+                    else
+                        f
+                )
+    in
+    { fieldset | rows = List.map disableFieldsInRow fieldset.rows }
+
+
+disable : Set String -> FieldSet -> FieldSet
+disable =
+    setDisabledto True
+
+
+enable : Set String -> FieldSet -> FieldSet
+enable =
+    setDisabledto False
