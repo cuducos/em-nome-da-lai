@@ -99,8 +99,8 @@ updateAndLoadCompany result =
         result
 
 
-updateCompany : Company -> FieldSet -> FieldSet
-updateCompany company fieldset =
+updateCompany : Company -> Model -> ( Model, Cmd Msg )
+updateCompany company model =
     let
         address : List String
         address =
@@ -117,22 +117,19 @@ updateCompany company fieldset =
                 , ( "CEP", company.postalCode )
                 ]
 
-        updateValue : Field -> Field
-        updateValue f =
-            case Dict.get f.label asDict of
-                Just value ->
-                    { f | value = value }
+        form : Form
+        form =
+            model.form
 
-                Nothing ->
-                    f
-
-        institution : FieldSet
-        institution =
-            Form.Update.enable
-                (Set.fromList [ "Razão social", "Endereço", "Cidade", "UF", "CEP" ])
-                fieldset
+        toUpdate : String -> ( Model, Cmd Msg ) -> ( Model, Cmd Msg )
+        toUpdate key ( m, msg ) =
+            asDict
+                |> Dict.get key
+                |> Maybe.map (\v -> updateForm key m { form | institution = Form.Update.set key v m.form.institution })
+                |> Maybe.withDefault ( m, msg )
+                |> (\( newModel, newMsg ) -> ( newModel, Cmd.batch [ msg, newMsg ] ))
     in
-    { institution | rows = List.map (\r -> List.map updateValue r) institution.rows }
+    List.foldr toUpdate ( model, Cmd.none ) [ "Razão social", "Endereço", "Cidade", "UF", "CEP" ]
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -171,14 +168,7 @@ update msg model =
             updateForm key model { form | ticket = Form.Update.set key value form.ticket }
 
         LoadCompany (Ok company) ->
-            let
-                newForm : Form
-                newForm =
-                    model.form
-            in
-            ( { model | form = { newForm | institution = updateCompany company form.institution } }
-            , Cmd.none
-            )
+            updateCompany company model
 
         LoadCompany (Err err) ->
             ( model, Cmd.none )
